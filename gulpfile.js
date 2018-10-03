@@ -9,9 +9,10 @@ const cache = require('gulp-cache');
 const concat = require('gulp-concat');
 const downloadStream=require('gulp-download-stream');
 const minify = require('gulp-babel-minify');
-var rename = require("gulp-rename");
-var runSequence = require('run-sequence');
-var wait = require('gulp-wait');
+const rename = require("gulp-rename");
+const runSequence = require('run-sequence');
+const wait = require('gulp-wait');
+const filter=require('gulp-filter');
 
 
 
@@ -66,8 +67,7 @@ gulp.task('html', function () {
 
 // SASS INTO CSS THEN AUTOPREFIXING THEN MINIFY
 gulp.task('sass', () => {
-    return gulp.src('src/scss/styles.scss')
-        
+    return gulp.src('src/scss/styles.scss')        
         .pipe(sass().on('error', sass.logError))
         .pipe(autoprefixer('last 2 versions'))
         .pipe(cleanCSS())
