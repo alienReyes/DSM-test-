@@ -18,28 +18,42 @@ const shorthand = require('gulp-shorthand');
 
 
 var env,
+    sourceDir,
     jsSources,
     jsonSources,
     sassSources,
     htmlSources,
     outputDir,
     cssFiles,
+    cssPreprocessor,
+    dsmURL,   
     sassStyle;
-
-    sassSources='./src/scss/';
+    sourceDir='./src/'
+    cssPreprocessor='scss',    
     outputDir='./dist/'
+    cssSources=sourceDir+cssPreprocessor; 
+
+    if (cssPreprocessor==='less'){
+        dsmURL='https://projects.invisionapp.com/dsm-export/vectorworks-web-team/vectorworks/style-params.less?key=H1dDT-xF7';
+
+    }
+    else {
+        dsmURL='https://projects.invisionapp.com/dsm-export/vectorworks-web-team/vectorworks/_style-params.scss?key=H1dDT-xF7'
+        
+    }
 
 
 
 // download INVSION DSM FILE
 // HTML MINIFICATION
 gulp.task('download', function () {
-    downloadStream("https://projects.invisionapp.com/dsm-export/vectorworks-web-team/vectorworks/_style-params.scss?key=H1dDT-xF7")
-    .pipe(rename("dsm.scss"))
-    .pipe(gulp.dest("./src/scss/")) 
+    downloadStream(dsmURL)
+    .pipe(rename('dsm.'+cssPreprocessor))
+    .pipe(gulp.dest(cssSources)) 
     .on('end',function(){
-      gulp.start('sass');
-       console.log("download complete")
+
+     // gulp.start('sass');
+       console.log(cssSources)
     }) 
     
     
@@ -70,19 +84,11 @@ gulp.task('updateDSM', function () {
 });
 
 
-// HTML MINIFICATION
-gulp.task('html', function () {
-    return gulp.src('src/*.html')
-        .pipe(htmlmin({ collapseWhitespace: true }))
-        .pipe(gulp.dest('./dist/'))
-        .pipe(reload({ stream: true }))
-});
-
 
 
 // SASS INTO CSS THEN AUTOPREFIXING THEN MINIFY
 gulp.task('sass', () => {
-    return gulp.src(sassSources+'/styles.scss')
+    return gulp.src(cssSources+'/styles.scss')
         .pipe(sourcemaps.init())        
         .pipe(sass().on('error', sass.logError)) 
         .pipe(shorthand())                 
@@ -95,16 +101,9 @@ gulp.task('sass', () => {
 
 
 
-// CONCAT ALL JS SCRIPTS INTO ALL.JS // CHANGE SRC PATHS TO REFLECT YOUR SCRIPTS
-// ES6 TO ES5 VIA BABEL, THEN MINIFES
-gulp.task('scripts', () => {
-    gulp.src(['src/scripts/smooth-scroll.js', 'dev/scripts/script.js'])
-        .pipe(concat('main.js'))       
-        .pipe(gulp.dest('dist/js/'))
-        .pipe(reload({ stream: true }))
-});
+
 
 // ALL TASKS INTO ONE INIT
 // ACTIVATE BUT RUNNING 'GULP' IN THE TERMINAL
-gulp.task('default', ['download','html', 'scripts', 'browser-sync','watch']);
+gulp.task('default', ['download', 'browser-sync','watch']);
 // Create task for gulp deployment
