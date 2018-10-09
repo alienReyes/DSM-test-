@@ -15,6 +15,7 @@ const wait = require('gulp-wait');
 const filter=require('gulp-filter');
 const sourcemaps = require('gulp-sourcemaps');
 const shorthand = require('gulp-shorthand');
+const less= require('gulp-less');
 
 
 var env,
@@ -28,9 +29,14 @@ var env,
     cssPreprocessor,
     dsmURL,   
     sassStyle;
-    sourceDir='./src/'
-    cssPreprocessor='scss',    
-    outputDir='./dist/'
+    // set environment development or production
+    env='development'
+    // path for scss or less files
+    sourceDir='./src/';
+    // choose css preprocesosr less or scss
+    cssPreprocessor='less';
+    //output folder for the css
+    outputDir='./dist/';
     cssSources=sourceDir+cssPreprocessor; 
 
     if (cssPreprocessor==='less'){
@@ -51,9 +57,12 @@ gulp.task('download', function () {
     .pipe(rename('dsm.'+cssPreprocessor))
     .pipe(gulp.dest(cssSources)) 
     .on('end',function(){
-
-     // gulp.start('sass');
-       console.log(cssSources)
+    if (cssPreprocessor==='scss'){
+      gulp.start('sass');    
+        }
+      else {
+        console.log('less');
+    }  
     }) 
     
     
@@ -99,6 +108,19 @@ gulp.task('sass', () => {
         .pipe(reload({ stream: true }))
 });
 
+
+// LESS TASK
+gulp.task('less', function () {
+    return gulp.src(cssSources+'/styles.less')     
+    .pipe(sourcemaps.init()) 
+    .pipe(less())
+    //.pipe(shorthand())                 
+    //.pipe(autoprefixer('last 2 versions'))        
+    //.pipe(cleanCSS())    
+    .pipe(sourcemaps.write('maps/'))                 
+    .pipe(gulp.dest(outputDir+'css/'))
+    .pipe(reload({ stream: true }))
+  });
 
 
 
